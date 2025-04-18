@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Raccourcisseur d'URL</title>
+  <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="#" class="navbar-logo">
+        <div class="logo-icon">🔗</div>
+        <span>URL Shortener</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="/register" class="nav-link">S'inscrire</a>
+        <a href="/login" class="nav-link active">Se connecter</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <h2>Connexion</h2>
+      </div>
+      <form id="loginForm" method="POST" action="/login">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" id="username" name="username" placeholder="Entrez votre nom d'utilisateur" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe" required>
+          </div>
+        </div>
+        <button type="submit">Se connecter</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Raccourcisseur d'URL</title>
+    <link rel="stylesheet" href="/css/register.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-logo">
+                <div class="logo-icon">🔗</div>
+                <span>URL Shortener</span>
+            </a>
+            <div class="navbar-nav">
+                <a href="/register" class="nav-link active">S'inscrire</a>
+                <a href="/login" class="nav-link">Se connecter</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Inscription</h2>
+            </div>
+            <form id="registerForm" method="POST" action="/register">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Nom d'utilisateur</label>
+                        <input type="text" id="username" name="username" placeholder="Entrez votre nom d'utilisateur"
+                            required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Entrez votre email" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+                        <input type="password" id="password" name="password" placeholder="Entrez votre mot de passe"
+                            minlength="4" maxlength="6" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmer le mot de passe</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                            placeholder="Confirmez votre mot de passe" minlength="4" maxlength="6" required>
+                    </div>
+                </div>
+                <button type="submit">S'inscrire</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

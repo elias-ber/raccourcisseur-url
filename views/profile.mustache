@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil - Raccourcisseur d'URL</title>
+    <link rel="stylesheet" href="/css/profile.css">
+    <script src="js/profile.js"></script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-logo">
+                <div class="logo-icon">🔗</div>
+                <span>URL Shortener</span>
+            </a>
+            <div class="navbar-nav">
+                <a href="/dashboard" class="nav-link">Dashboard</a>
+                <a href="/profile" class="nav-link active">Profil</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">🔗</div>
+                <h1>Profil</h1>
+            </div>
+        </header>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Informations du Profil</h2>
+            </div>
+            <form id="profileForm" method="POST" action="/profile">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">Nom d'utilisateur</label>
+                        <input type="text" id="username" name="username" value="{{user.username}}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="{{user.email}}" required>
+                    </div>
+                </div>
+                <button type="submit">Mettre à jour le profil</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Changer le Mot de Passe</h2>
+            </div>
+            <form id="passwordForm" method="POST" action="/profile">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="currentPassword">Mot de passe actuel</label>
+                        <input type="password" id="currentPassword" name="currentPassword"
+                            placeholder="Entrez votre mot de passe actuel" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="newPassword">Nouveau mot de passe</label>
+                        <input type="password" id="newPassword" name="newPassword"
+                            placeholder="Entrez un nouveau mot de passe" minlength="4" maxlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                            placeholder="Confirmez le nouveau mot de passe" minlength="4" maxlength="6" required>
+                    </div>
+                </div>
+                <button type="submit">Changer le mot de passe</button>
+            </form>
+        </div>
+
+        <!-- Formulaire caché pour la déconnexion -->
+        <form id="logoutForm" method="POST" action="/logout" style="display:none;">
+            <button type="submit">Logout</button>
+        </form>
+
+        <!-- Bouton de déconnexion -->
+        <button id="logoutButton" class="btn-danger">Déconnexion</button>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Raccourcisseur d'URL</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <script src="js/dashboard.js"></script>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-logo">
+                <div class="logo-icon">🔗</div>
+                <span>URL Shortener</span>
+            </a>
+            <div class="navbar-nav">
+                <a href="/dashboard" class="nav-link active">Dashboard</a>
+                <a href="/profile" class="nav-link">Profil</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-value">{{activeUrlsCount}}</div>
+                <div class="stat-label">URLs totales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{totalClicks}}</div>
+                <div class="stat-label">Clicks Totaux</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{protectedUrlsCount}}</div>
+                <div class="stat-label">URLs Protégées</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Créer une URL raccourcie</h2>
+            </div>
+            <form id="shortenForm" method="POST" action="/links">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="originalUrl">URL à raccourcir</label>
+                        <input type="url" id="originalUrl" name="originalUrl"
+                            placeholder="https://exemple.com/page-avec-url-tres-longue" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="customAlias">Alias personnalisé (facultatif)</label>
+                        <input type="text" id="customAlias" name="customAlias" placeholder="mon-alias">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Protection par mot de passe (facultatif, 4-6 caractères)</label>
+                        <input type="text" id="password" name="password" placeholder="Laissez vide pour ne pas protéger"
+                            minlength="4" maxlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="expiration">Durée de validité</label>
+                        <select id="expiration" name="expiration">
+                            <option value="never">Pas d'expiration</option>
+                            <option value="1h">1 heure</option>
+                            <option value="24h">24 heures</option>
+                            <option value="7d">7 jours</option>
+                            <option value="30d">30 jours</option>
+                            <option value="custom">Personnalisé</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row" id="customExpirationRow" style="display: none;">
+                    <div class="form-group">
+                        <label for="customExpirationDate">Date d'expiration</label>
+                        <input type="date" id="customExpirationDate" name="customExpirationDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="customExpirationTime">Heure d'expiration</label>
+                        <input type="time" id="customExpirationTime" name="customExpirationTime">
+                    </div>
+                </div>
+                <button type="submit">Créer un lien court</button>
+            </form>
+
+
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Mes URLs raccourcies</h2>
+                <div class="bulk-actions">
+                    <button id="deleteSelected" class="btn-danger" disabled>Supprimer</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll"></th>
+                            <th>ID</th>
+                            <th>URL courte</th>
+                            <th>Destination</th>
+                            <th>Clics</th>
+                            <th>Création</th>
+                            <th>Expiration</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#links}}
+                        <tr data-id="{{id}}" class="url-row">
+                            <td><input type="checkbox" class="row-select"></td>
+                            <td>{{id}}</td>
+                            <td>
+                                <a href="http://localhost:3000/{{short_id}}" target="_blank">{{short_id}}</a>
+                                {{#password_hash}}
+                                <span class="password-protected" title="Protégé par mot de passe">🔒</span>
+                                {{/password_hash}}
+                            </td>
+                            <td>{{redirection}}</td>
+                            <td>{{visits.length}}</td>
+                            <td>{{created_at}}</td>
+                            <td>
+                                {{#expirated_at}}
+                                {{#isExpired}}Expiré{{/isExpired}}
+                                {{^isExpired}}
+                                {{#isPermanent}}Permanent{{/isPermanent}}
+                                {{^isPermanent}}{{remainingTime}}{{/isPermanent}}
+                                {{/isExpired}}
+                                {{/expirated_at}}
+                                {{^expirated_at}}Permanent{{/expirated_at}}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-secondary qr-button" data-url="{{short_id}}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" viewBox="0 0 16 16">
+                                            <path d="M2 2h2v2H2V2Z"></path>
+                                            <path d="M6 0v6H0V0h6ZM5 1H1v4h4V1ZM4 12H2v2h2v-2Z"></path>
+                                            <path
+                                                d="M6 10v6H0v-6h6Zm-5 1v4h4v-4H1Zm0 5V4h1v2H2v2H1v2h1v2h1v-2h1v-2h-1v-2h1Z">
+                                            </path>
+                                            <path d="M7 12h1v3h4v1H7v-4Zm9 2v2h-3v-1h2v-1h1Z"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="btn-icon btn-secondary stats-button" data-id="{{id}}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 0 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/links}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure for QR Code -->
+    <div class="modal-backdrop" id="qrModalBackdrop">
+        <div class="modal" id="qrModal">
+            <div class="modal-header">
+                <h2 id="qrModalTitle">QR Code</h2>
+                <button id="closeQrModal" class="btn-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="qrCodeContainer"></div>
+            </div>
+            <div class="modal-footer">
+                <a id="downloadQrCode" download="qrcode.png" class="btn-primary">Télécharger</a>
+                <button id="closeQrModalFooter" class="btn-secondary">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure for Stats -->
+    <div class="modal-backdrop" id="urlModalBackdrop">
+        <div class="modal modal-lg" id="urlModal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Statistiques de l'URL</h2>
+                <button id="closeModal" class="btn-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stats-table">
+                        <h3>Répartition des clics par jour</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Clics</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clicksTableBody">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="stats-table">
+                        <h3>Répartition des clics par heure</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Heure</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hourlyClicksTableBody">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="stats-table">
+                        <h3>Répartition des clics par IP</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>IP</th>
+                                    <th>Clics</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ipTableBody">
+                                <!-- Dynamic content will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="closeModalFooter" class="btn-secondary">Fermer</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
