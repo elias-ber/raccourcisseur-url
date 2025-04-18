@@ -113,18 +113,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ ids })
+            }).then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        console.error('Error data:', errorData);
+                        throw new Error(errorData.message || 'Erreur lors de la suppression des URLs');
+                    });
+                }
+                return response.json();
             })
-                .then(response => response.json())
                 .then(data => {
+                    console.log('Success data:', data);
                     if (data.success) {
                         location.reload();
                     } else {
                         alert('Erreur lors de la suppression des URLs');
                     }
-                })
-                .catch(error => {
-                    console.error('Erreur lors de la suppression des URLs:', error);
-                    alert('Erreur lors de la suppression des URLs');
+                }).catch(error => {
+                    console.error('Erreur lors de la requête:', error);
+                    alert(error.message);
                 });
         }
     });

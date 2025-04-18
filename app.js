@@ -38,9 +38,9 @@ app.post('/logout', logout);
 
 // Routes de gestion des liens
 app.post('/links', isAuthenticated, createLink);
+app.post('/links/delete', isAuthenticated, deleteMultipleLinks);
 app.post('/links/:id', isAuthenticated, updateLink);
 app.post('/links/:id/delete', isAuthenticated, deleteLink);
-app.post('/links/delete', isAuthenticated, deleteMultipleLinks);
 app.post('/links/bulk-upload', isAuthenticated, upload.single('file'), bulkUploadLinks);
 app.get('/links/:id/stats', isAuthenticated, getLinkStats);
 
@@ -127,20 +127,29 @@ app.get('/:shortId', redirectToLink);
 
 // Gestion des erreurs 404
 app.use((req, res) => {
-    res.status(404).render('error', {
-        message: 'Page non trouvée',
-        error: { status: 404 }
-    });
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        res.status(404).json({ success: false, message: 'Page non trouvée' });
+    } else {
+        res.status(404).render('error', {
+            message: 'Page non trouvée',
+            error: { status: 404 }
+        });
+    }
 });
 
 // Gestion des erreurs 500
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).render('error', {
-        message: 'Erreur serveur',
-        error: process.env.NODE_ENV === 'development' ? err : {}
-    });
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        res.status(500).json({ success: false, message: 'Erreur serveur' });
+    } else {
+        res.status(500).render('error', {
+            message: 'Erreur serveur',
+            error: process.env.NODE_ENV === 'development' ? err : {}
+        });
+    }
 });
+
 
 const formatDate = (date) => {
     const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' };

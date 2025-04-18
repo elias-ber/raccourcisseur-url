@@ -156,18 +156,23 @@ const deleteLink = async (req, res) => {
 const deleteMultipleLinks = async (req, res) => {
     try {
         const { ids } = req.body;
+        console.log('IDs à supprimer :', ids);
         await db.links.update({ is_active: 0 }, {
             where: {
                 id: ids,
                 created_by: req.user.id
             }
         });
+        console.log('Lien(s) supprimé(s)');
         res.json({ success: true });
     } catch (err) {
         console.error('Erreur lors de la suppression des liens:', err);
         res.status(500).json({ success: false, message: 'Erreur serveur' });
     }
 };
+
+
+
 
 const bulkUploadLinks = async (req, res) => {
     try {
