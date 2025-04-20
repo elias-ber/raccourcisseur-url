@@ -1,5 +1,6 @@
 const passport = require('passport');
 const argon2 = require('argon2');
+const { Sequelize } = require('sequelize')
 const db = require('../models/init-models')(require('../config/sequelize'));
 
 const login = (req, res, next) => {
